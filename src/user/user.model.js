@@ -12,12 +12,10 @@ const userSchema = Schema({
     username: {
         type: String,
         unique: true,
-        lowercase: true,
         required: true
     },
     password: {
         type: String,
-        minLength: [5, 'Password must be 5 characters'],
         required: true
     },
     email: {

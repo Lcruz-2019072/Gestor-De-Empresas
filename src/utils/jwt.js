@@ -3,7 +3,7 @@
 import jwt from 'jsonwebtoken'
 const secretKey = '@LlaveSecreta@'
 
-export const generarjwt = async(payload)=>{
+export const generateJwt = async(payload)=>{
     try {
         return jwt.sign(payload, secretKey, {
             expiresIn: '3h', 

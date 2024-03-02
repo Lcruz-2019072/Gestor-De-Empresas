@@ -1,0 +1,97 @@
+'use strict'
+
+import User from './user.model.js'
+import { generateJwt } from '../utils/jwt.js'
+import { encrypt, checkPassword, checkUpdate } from '../utils/validator.js'
+
+export const test = (req, res)=>{
+    console.log('test is running')
+    return res.send({message: 'Test is okay :D'})
+}
+
+export const register = async(req,res) =>{
+    try{
+        
+        let data = req.body
+        console.log(data)
+        data.password = await encrypt(data.password)
+        let user = User(data)
+        await user.save()
+        return res.send({message: `Registered succesfully, You can login now ${user.username}`})
+    }catch(error){
+        console.error(error)
+        if(error.keyValue.username) return res.status(400).send({message: `username ${error.keyValue.username} is exist`})
+        return res.status(500).send({message: 'Error to register the user', error: error})
+        
+        
+    }
+}
+
+export const login = async (req, res)=> {
+    try {
+        let data = req.body
+        let loginUser = await User.findOne({
+            $or:[
+                {
+                    username: data.username
+                },
+                {
+                    email: data.email
+                }
+            ]
+        })
+        if(!loginUser) return res.status(404).send({message: 'username or email is not the correct'})
+
+        if(loginUser){
+            if(await checkPassword(data.password, loginUser.password)){
+                let userLogged = {
+                    uid: loginUser._id,
+                    username: loginUser.username,
+                    name: loginUser.name
+                }
+                let token = await generateJwt(userLogged)
+                return res.send({message: `Welcome ${userLogged.name}`, userLogged, token})
+            }
+        }
+    } catch(error){
+        console.error(error)
+            return res.send(500).send({message:'Error the user cant login', error: error})
+    }
+}
+
+export const updateU = async(req, res)=>{
+    try{
+        let data = req.body
+        data._id = req.user._id
+
+        let updateUser =await checkUpdate(data, data._id)
+        if(!updateUser) return res.status(400).send({message: 'Error to update, please check your data'})
+        let update = await User.findOneAndUpdate(
+            { _id: data._id},
+            data,
+            {new: true}
+        )
+        if(update) return res.status(401).send({message: 'user not found'})
+        return res.send ({message: 'user update', updateUser})
+
+    }catch(error){
+        console.error(error)
+        if(error.keyValue.username) return res.status(400).send({message: `username ${error.keyValue.username} is already existed`})
+        return res.status(500).send({message: 'Error to update'})
+        
+    }
+}
+
+    export const deleteU = async (req, res)=>{
+        try{
+            let data = req.body
+            data._id = req.user._id
+            let deleteUser = await User.findOneAndDelete({_id: data._id})
+            if(!deleteUser) return res.status(404).send({message: 'User not found , check your data'})
+                return res.send({message: `User ${deleteUser.username} deleted successfully`})
+        }catch(error) {
+            console.error(error)
+            return res.status(500).send({message: 'Errot to delete the usear'})
+        }
+    }
+
