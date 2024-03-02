@@ -5,6 +5,8 @@ import morgan from 'morgan'
 import { config } from "dotenv"
 
 import userRoutes from '../src/user/user.routes.js' 
+import categoryRoutes from '../src/category/category.routes.js'
+import companyRoutes from '../src/company/company.routes.js'
 
 
 
@@ -19,7 +21,8 @@ app.use(express.json())
 app.use(morgan('dev')) //Logs de solicitudes al servidor HTTP
 
 app.use('/user', userRoutes)
-
+app.use('/category', categoryRoutes)
+app.use('/company', companyRoutes)
 
 
 export const initServer = ()=>{
