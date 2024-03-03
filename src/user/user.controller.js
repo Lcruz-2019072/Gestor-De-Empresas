@@ -60,26 +60,27 @@ export const login = async (req, res)=> {
 }
 
 export const updateU = async(req, res)=>{
-    try{
+    try {
         let data = req.body
         data._id = req.user._id
 
-        let updateUser =await checkUpdate(data, data._id)
-        if(!updateUser) return res.status(400).send({message: 'Error to update, please check your data'})
-        let update = await User.findOneAndUpdate(
-            { _id: data._id},
+        let updateUser =  await checkUpdate(data, data._id)
+        if(!updateUser) return res.status(400).send({message: 'Have submitted some data that cannot be update'})
+        let updateU = await User.findOneAndUpdate(
+            { _id: data._id },
             data,
-            {new: true}
+            {new: true} 
         )
-        if(update) return res.status(401).send({message: 'user not found'})
-        return res.send ({message: 'user update', updateUser})
+        if (!updateU) return res.status(401).send({ message: 'user not found' })
+        return res.send({ message: 'user update', updateU })
 
-    }catch(error){
-        console.error(error)
-        if(error.keyValue.username) return res.status(400).send({message: `username ${error.keyValue.username} is already existed`})
-        return res.status(500).send({message: 'Error to update'})
         
+    } catch (error) {
+        console.error(error)
+        if(error.keyValue.username) return res.status(400).send({message: `username ${error.keyValue.username} is alredy taken ` })
+        return res.status(500).send({ message: 'Error updating' })
     }
+
 }
 
     export const deleteU = async (req, res)=>{
@@ -95,3 +96,34 @@ export const updateU = async(req, res)=>{
         }
     }
 
+    export const updatePassword = async(req, res)=>{
+        try {
+            let data = req.body
+            data._id = req.user._id
+    
+            if (data.password) {
+                let user = await User.findById(data._id);
+                if (!user) return res.status(401).send({ message: 'User not found' })
+        
+                let currentPassword = await checkPassword(data.password, user.password)
+                if (!currentPassword) {
+                    return res.status(400).send({ message: 'The password is not correct' })
+                }else{
+                    data.password = await encrypt(data.newPassword)
+                }
+            }
+            let update =  await checkUpdatePassword(data, data._id)
+            if(!update) return res.status(400).send({message: 'Have submitted some data that cannot be Update password'})
+            let updateUser = await User.findOneAndUpdate(
+                { _id: data._id },
+                data,
+                {new: true} 
+            )
+            if (!updateUser) return res.status(401).send({ message: 'user not found' })
+            return res.send({ message: 'Update password', updateUser })
+        } catch (error) {
+            console.error(error)
+            return res.status(500).send({ message: 'Error Update password' })
+        }
+    
+    }

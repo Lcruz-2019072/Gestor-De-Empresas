@@ -34,10 +34,40 @@ export const checkUpdate = async(data, id)=>{
             return true         
         }else {
             if (Object.entries(data).length === 0 ||
-                data.levelImpact ||
-                data.levelImpact == '') {
+                data.Impact ||
+                data.Impact == '') {
                 return false
             }
             return true
+        }
+    }
+
+    export const checkUpdateCompany = async (data, id) => {
+        if (id) {
+            if (Object.entries(data).length === 0 ||
+                data.Impact ||
+                data.Impact == '') {
+                return false
+            }
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    
+    export const checkUpdatePassword = async (data, id) => {
+        if (id) {
+            if (Object.entries(data).length === 0 ||
+                data.name ||
+                data.surname ||
+                data.username ||
+                data.email ||
+                data.phone) {
+                return false
+            }
+            return true
+        } else {
+            return false
         }
     }

@@ -1,17 +1,17 @@
 import { Schema, model} from "mongoose"
 
 const companySchema = Schema({
-    nameCompany: {
+    Company: {
         type: String,
         required: true
     },
-    experienceYears: {
+    Years: {
         type: String,
         required: true
     },
-    levelImpact: {
+    Impact: {
         type: String,
-        enum: ['LOW', 'MEDIUM', 'HIGH'],
+        enum: ['NEW', 'MID', 'MID-HIGH', 'HIGH'],
         uppercase: true,
         required: true
     },
